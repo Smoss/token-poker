@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Token Poker</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main id="token-poker-app" class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">TP</div>
+          <div>
+            <h1>Token Poker</h1>
+            <p class="subtitle">Estimate hand-coding against AI delegation with visible economics.</p>
+          </div>
+        </div>
+        <div class="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="sessionStatus">Ready</span>
+        </div>
+      </header>
+
+      <section class="band" aria-labelledby="task-heading">
+        <div class="section-head">
+          <div>
+            <h2 id="task-heading">Session</h2>
+            <p class="section-note">Current state is saved in this browser only.</p>
+          </div>
+          <div class="button-row">
+            <button class="secondary" id="newTask" type="button">New task</button>
+            <button class="secondary" id="resetSession" type="button">Reset session</button>
+          </div>
+        </div>
+        <div class="setup-grid">
+          <label>
+            Task
+            <input id="taskTitle" placeholder="Describe the work to estimate">
+          </label>
+          <label>
+            Hourly rate
+            <input id="hourlyRate" type="number" min="1" step="5">
+          </label>
+          <label>
+            Active player
+            <select id="activePlayer"></select>
+          </label>
+        </div>
+      </section>
+
+      <div class="layout">
+        <section class="panel players-panel" aria-labelledby="players-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="players-heading">Players</h2>
+              <p class="section-note">Add up to six people for this local session.</p>
+            </div>
+            <button class="secondary" id="addPlayer" type="button">Add player</button>
+          </div>
+          <div class="players" id="playerList"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="estimate-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="estimate-heading">Estimate entry</h2>
+              <p class="section-note" id="activePlayerHelp">Choose an active player to enter an estimate.</p>
+            </div>
+            <span class="pill" id="activePlayerStatus">Open</span>
+          </div>
+          <div class="estimate-fields">
+            <label>
+              Fibonacci points
+              <select id="fibonacciPoints"></select>
+            </label>
+            <label>
+              No-AI implementation time
+              <div class="range-line">
+                <input id="noAiHours" type="range" min="0.5" max="80" step="0.5">
+                <span class="value-chip" id="noAiHoursValue">0.0h</span>
+              </div>
+            </label>
+            <label>
+              Model
+              <select id="estimateModel"></select>
+            </label>
+            <label>
+              Total AI tokens
+              <div class="token-control">
+                <div class="range-line">
+                  <input id="tokenSlider" type="range" min="0" max="1000" step="1">
+                  <span class="value-chip" id="tokenValue">0</span>
+                </div>
+                <input id="tokenNumber" type="number" min="0" max="10000000" step="50000" aria-label="Exact total AI tokens">
+              </div>
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="primary" id="saveEstimate" type="button">Save estimate</button>
+            <button class="secondary" id="nextPlayer" type="button">Next player</button>
+            <button class="primary" id="reveal" type="button">Reveal</button>
+          </div>
+        </section>
+
+        <section class="panel pricing-panel" aria-labelledby="pricing-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="pricing-heading">Pricing snapshot</h2>
+              <p class="section-note">Editable per million tokens. Token estimates use the visible input/output split.</p>
+            </div>
+            <button class="secondary" id="resetPricing" type="button">Reset pricing</button>
+          </div>
+          <div class="split-grid" aria-label="Token split">
+            <label>
+              Input share
+              <input id="inputShare" type="number" min="0" max="100" step="1">
+            </label>
+            <label>
+              Output share
+              <input id="outputShare" type="number" min="0" max="100" step="1">
+            </label>
+            <p class="section-note">DeepSeek uses cache-miss input pricing for calculations; cache-hit pricing is context only.</p>
+          </div>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Input</th>
+                  <th>Output</th>
+                  <th>Cached input</th>
+                </tr>
+              </thead>
+              <tbody id="pricingRows"></tbody>
+            </table>
+          </div>
+          <div class="source-list" id="pricingSources"></div>
+        </section>
+
+        <section class="results" aria-labelledby="results-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="results-heading">Results</h2>
+              <p class="section-note">Estimates stay hidden until every player has submitted and the session is revealed.</p>
+            </div>
+            <button class="secondary" id="revote" type="button">Revote</button>
+          </div>
+          <div id="resultsView"></div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

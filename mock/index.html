@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Token Poker Mock</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17202a;
+        --muted: #5e6875;
+        --soft: #f5f7fa;
+        --line: #d9e0e8;
+        --panel: #ffffff;
+        --teal: #127c75;
+        --teal-soft: #dff4f1;
+        --blue: #295f98;
+        --blue-soft: #e4eef9;
+        --rose: #9f3752;
+        --rose-soft: #f8e4ea;
+        --amber: #916116;
+        --amber-soft: #f6ecd8;
+        --shadow: 0 18px 50px rgba(23, 32, 42, 0.09);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, #eef3f7 0%, #fbfcfd 42%, #f2f5f8 100%);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.45;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 40px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .mark {
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--ink);
+        color: #fff;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(1.65rem, 4vw, 2.55rem);
+        line-height: 1.05;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-top: 4px;
+        font-size: 0.98rem;
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.78);
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--teal);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .band,
+      .panel,
+      .results {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: var(--shadow);
+      }
+
+      .band {
+        grid-column: 1 / -1;
+        padding: 18px;
+      }
+
+      .panel,
+      .results {
+        padding: 18px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .section-head h2 {
+        font-size: 1.04rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      input,
+      select {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        padding: 9px 11px;
+      }
+
+      input:focus,
+      select:focus,
+      button:focus-visible {
+        outline: 3px solid rgba(18, 124, 117, 0.2);
+        outline-offset: 2px;
+      }
+
+      .size-grid,
+      .model-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .choice {
+        min-height: 76px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        text-align: left;
+        color: var(--ink);
+      }
+
+      .choice strong {
+        display: block;
+        font-size: 0.98rem;
+      }
+
+      .choice span {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .choice.active {
+        border-color: var(--teal);
+        background: var(--teal-soft);
+      }
+
+      .players {
+        display: grid;
+        gap: 10px;
+      }
+
+      .player-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .player-row strong {
+        display: block;
+      }
+
+      .player-row span {
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .pill {
+        border-radius: 999px;
+        padding: 6px 10px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-size: 0.78rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .pill.done {
+        background: var(--teal-soft);
+        color: var(--teal);
+      }
+
+      .estimate-fields {
+        display: grid;
+        gap: 13px;
+      }
+
+      .range-line {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .range-line input {
+        padding: 0;
+        accent-color: var(--teal);
+      }
+
+      .value-chip {
+        min-width: 72px;
+        border-radius: 8px;
+        background: var(--soft);
+        padding: 8px 10px;
+        color: var(--ink);
+        font-weight: 800;
+        text-align: right;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 16px;
+      }
+
+      .primary,
+      .secondary,
+      .text-button {
+        min-height: 42px;
+        border-radius: 8px;
+        padding: 10px 13px;
+        font-weight: 800;
+      }
+
+      .primary {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .primary:disabled {
+        cursor: not-allowed;
+        background: #aab3bd;
+      }
+
+      .secondary {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .text-button {
+        background: transparent;
+        color: var(--teal);
+      }
+
+      .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin: 14px 0;
+      }
+
+      .metric {
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--soft);
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 1.35rem;
+      }
+
+      .insight {
+        margin: 12px 0 14px;
+        border-radius: 8px;
+        padding: 13px;
+        background: var(--amber-soft);
+        color: var(--amber);
+        font-weight: 800;
+      }
+
+      .result-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .result-card {
+        display: grid;
+        gap: 9px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 12px;
+      }
+
+      .result-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .result-top strong {
+        min-width: 0;
+      }
+
+      .delta {
+        border-radius: 999px;
+        padding: 5px 9px;
+        background: var(--rose-soft);
+        color: var(--rose);
+        font-size: 0.78rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .delta.ai {
+        background: var(--teal-soft);
+        color: var(--teal);
+      }
+
+      .bar-pair {
+        display: grid;
+        gap: 7px;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 74px minmax(0, 1fr) 72px;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 800;
+      }
+
+      .track {
+        position: relative;
+        height: 13px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e9edf2;
+      }
+
+      .fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: var(--w);
+        border-radius: inherit;
+        background: var(--blue);
+      }
+
+      .fill.ai-human {
+        background: var(--teal);
+      }
+
+      .fill.ai-token {
+        left: var(--human-w);
+        width: var(--token-w);
+        background: var(--amber);
+      }
+
+      .scope-ladder {
+        margin-top: 14px;
+        border: 1px solid #ead5a9;
+        border-radius: 8px;
+        background: #fffaf0;
+        padding: 12px;
+      }
+
+      .scope-ladder h3 {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+      }
+
+      .ladder {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .ladder button {
+        min-height: 56px;
+        border: 1px solid #ead5a9;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--amber);
+        font-weight: 800;
+      }
+
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .setting-row {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 11px;
+        background: #fff;
+      }
+
+      .setting-row strong {
+        display: block;
+      }
+
+      .setting-row span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-top: 2px;
+      }
+
+      .source-note {
+        margin-top: 9px;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .empty {
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        padding: 18px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 900px) {
+        .layout,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .size-grid,
+        .model-grid,
+        .summary-strip,
+        .settings-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .shell {
+          width: min(100% - 20px, 1180px);
+          padding-top: 16px;
+        }
+
+        .topbar,
+        .section-head,
+        .result-top {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .status {
+          white-space: normal;
+        }
+
+        .size-grid,
+        .model-grid,
+        .summary-strip,
+        .settings-grid,
+        .ladder {
+          grid-template-columns: 1fr;
+        }
+
+        .bar-row {
+          grid-template-columns: 58px minmax(0, 1fr) 58px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">TP</div>
+          <div>
+            <h1>Token Poker</h1>
+            <p class="subtitle">A workshop estimation tool for comparing hand-coding with AI delegation.</p>
+          </div>
+        </div>
+        <div class="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="sessionStatus">4 of 4 estimates submitted</span>
+        </div>
+      </header>
+
+      <section class="band" aria-labelledby="task-heading">
+        <div class="section-head">
+          <h2 id="task-heading">Session setup</h2>
+          <button class="secondary" id="resetSession" type="button">Reset sample</button>
+        </div>
+        <div class="grid">
+          <label>
+            Task
+            <input id="taskTitle" value="Refactor checkout validation and add regression coverage">
+          </label>
+          <label>
+            Size
+            <select id="taskSize">
+              <option value="s">S - small function or config</option>
+              <option value="m" selected>M - feature slice or refactor</option>
+              <option value="l">L - multi-file feature</option>
+              <option value="xl">XL - subsystem pass</option>
+            </select>
+          </label>
+          <label>
+            Hourly rate
+            <input id="hourlyRate" type="number" min="1" step="5" value="100">
+          </label>
+          <label>
+            Current player
+            <select id="activePlayer"></select>
+          </label>
+        </div>
+      </section>
+
+      <div class="layout">
+        <section class="panel" aria-labelledby="players-heading">
+          <div class="section-head">
+            <h2 id="players-heading">Players</h2>
+            <button class="secondary" id="addPlayer" type="button">Add player</button>
+          </div>
+          <div class="players" id="playerList"></div>
+
+          <div class="settings-grid" id="pricingCards" aria-label="Model pricing"></div>
+          <p class="source-note">
+            Pricing snapshot from Anthropic, OpenAI, and DeepSeek API pricing pages,
+            checked June 10, 2026. DeepSeek input uses cache-miss pricing by default.
+          </p>
+        </section>
+
+        <section class="panel" aria-labelledby="estimate-heading">
+          <div class="section-head">
+            <h2 id="estimate-heading">Estimate entry</h2>
+            <span class="pill" id="activePlayerStatus">Not submitted</span>
+          </div>
+          <div class="estimate-fields">
+            <label>
+              Hand-code time
+              <div class="range-line">
+                <input id="handHours" type="range" min="0.1" max="16" step="0.1">
+                <span class="value-chip" id="handHoursValue"></span>
+              </div>
+            </label>
+            <label>
+              AI involvement time
+              <div class="range-line">
+                <input id="aiHours" type="range" min="0.1" max="16" step="0.1">
+                <span class="value-chip" id="aiHoursValue"></span>
+              </div>
+            </label>
+            <label>
+              Model tier
+              <div class="model-grid" id="modelChoices"></div>
+            </label>
+          </div>
+          <div class="actions">
+            <button class="primary" id="saveEstimate" type="button">Save estimate</button>
+            <button class="secondary" id="nextPlayer" type="button">Next player</button>
+            <button class="primary" id="reveal" type="button">Reveal</button>
+          </div>
+        </section>
+
+        <section class="results" aria-labelledby="results-heading">
+          <div class="section-head">
+            <h2 id="results-heading">Results</h2>
+            <button class="text-button" id="revote" type="button">Revote</button>
+          </div>
+          <div id="resultsView"></div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const STORAGE_KEY = "token-poker-mock";
+
+      const pricingSources = {
+        anthropic: {
+          provider: "Anthropic",
+          label: "Anthropic Claude API pricing",
+          url: "https://platform.claude.com/docs/en/about-claude/pricing",
+          checkedAt: "2026-06-10"
+        },
+        openai: {
+          provider: "OpenAI",
+          label: "OpenAI API pricing",
+          url: "https://openai.com/api/pricing/",
+          checkedAt: "2026-06-10"
+        },
+        deepseek: {
+          provider: "DeepSeek",
+          label: "DeepSeek Models & Pricing",
+          url: "https://api-docs.deepseek.com/quick_start/pricing",
+          checkedAt: "2026-06-10"
+        }
+      };
+
+      const legacyModelIds = {
+        premium: "claude-opus-4-8",
+        mid: "claude-sonnet-4-6",
+        budget: "claude-haiku-4-5"
+      };
+
+      const modelTiers = [
+        {
+          id: "claude-fable-5",
+          provider: "Anthropic",
+          label: "Claude Fable 5",
+          tier: "Frontier",
+          inputPricePerMTok: 10,
+          outputPricePerMTok: 50,
+          character: "highest capability",
+          pricingSourceUrl: pricingSources.anthropic.url,
+          pricingCheckedAt: pricingSources.anthropic.checkedAt
+        },
+        {
+          id: "claude-opus-4-8",
+          provider: "Anthropic",
+          label: "Claude Opus 4.8",
+          tier: "Premium",
+          inputPricePerMTok: 5,
+          outputPricePerMTok: 25,
+          character: "least review",
+          pricingSourceUrl: pricingSources.anthropic.url,
+          pricingCheckedAt: pricingSources.anthropic.checkedAt
+        },
+        {
+          id: "claude-sonnet-4-6",
+          provider: "Anthropic",
+          label: "Claude Sonnet 4.6",
+          tier: "Mid",
+          inputPricePerMTok: 3,
+          outputPricePerMTok: 15,
+          character: "balanced default",
+          pricingSourceUrl: pricingSources.anthropic.url,
+          pricingCheckedAt: pricingSources.anthropic.checkedAt
+        },
+        {
+          id: "claude-haiku-4-5",
+          provider: "Anthropic",
+          label: "Claude Haiku 4.5",
+          tier: "Budget",
+          inputPricePerMTok: 1,
+          outputPricePerMTok: 5,
+          character: "more iteration",
+          pricingSourceUrl: pricingSources.anthropic.url,
+          pricingCheckedAt: pricingSources.anthropic.checkedAt
+        },
+        {
+          id: "gpt-5-5",
+          provider: "OpenAI",
+          label: "GPT-5.5",
+          tier: "Frontier",
+          inputPricePerMTok: 5,
+          cachedInputPricePerMTok: 0.5,
+          outputPricePerMTok: 30,
+          character: "coding and professional work",
+          pricingSourceUrl: pricingSources.openai.url,
+          pricingCheckedAt: pricingSources.openai.checkedAt
+        },
+        {
+          id: "gpt-5-4",
+          provider: "OpenAI",
+          label: "GPT-5.4",
+          tier: "Mid",
+          inputPricePerMTok: 2.5,
+          cachedInputPricePerMTok: 0.25,
+          outputPricePerMTok: 15,
+          character: "price-performance default",
+          pricingSourceUrl: pricingSources.openai.url,
+          pricingCheckedAt: pricingSources.openai.checkedAt
+        },
+        {
+          id: "gpt-5-4-mini",
+          provider: "OpenAI",
+          label: "GPT-5.4 mini",
+          tier: "Budget",
+          inputPricePerMTok: 0.75,
+          cachedInputPricePerMTok: 0.075,
+          outputPricePerMTok: 4.5,
+          character: "mini coding model",
+          pricingSourceUrl: pricingSources.openai.url,
+          pricingCheckedAt: pricingSources.openai.checkedAt
+        },
+        {
+          id: "deepseek-v4-pro",
+          provider: "DeepSeek",
+          label: "DeepSeek-V4-Pro",
+          tier: "Pro",
+          inputPricePerMTok: 0.435,
+          cachedInputPricePerMTok: 0.003625,
+          outputPricePerMTok: 0.87,
+          character: "thinking-capable pro model",
+          pricingSourceUrl: pricingSources.deepseek.url,
+          pricingCheckedAt: pricingSources.deepseek.checkedAt
+        },
+        {
+          id: "deepseek-v4-flash",
+          provider: "DeepSeek",
+          label: "DeepSeek-V4-Flash",
+          tier: "Budget",
+          inputPricePerMTok: 0.14,
+          cachedInputPricePerMTok: 0.0028,
+          outputPricePerMTok: 0.28,
+          character: "low-cost thinking-capable model",
+          pricingSourceUrl: pricingSources.deepseek.url,
+          pricingCheckedAt: pricingSources.deepseek.checkedAt
+        }
+      ];
+
+      const sizePresets = {
+        s: {
+          label: "S",
+          inputTokensPerIteration: 1500,
+          outputTokensPerIteration: 2000,
+          iterations: 2
+        },
+        m: {
+          label: "M",
+          inputTokensPerIteration: 5000,
+          outputTokensPerIteration: 10000,
+          iterations: 3
+        },
+        l: {
+          label: "L",
+          inputTokensPerIteration: 18000,
+          outputTokensPerIteration: 40000,
+          iterations: 5
+        },
+        xl: {
+          label: "XL",
+          inputTokensPerIteration: 50000,
+          outputTokensPerIteration: 120000,
+          iterations: 8
+        }
+      };
+
+      const defaultState = {
+        taskTitle: "Refactor checkout validation and add regression coverage",
+        taskSize: "m",
+        hourlyRate: 100,
+        activePlayerId: "p1",
+        revealed: true,
+        players: [
+          {
+            id: "p1",
+            name: "Avery"
+          },
+          {
+            id: "p2",
+            name: "Mina"
+          },
+          {
+            id: "p3",
+            name: "Jordan"
+          },
+          {
+            id: "p4",
+            name: "Sam"
+          }
+        ],
+        estimates: {
+          p1: {
+            handCodeHours: 2.5,
+            aiInvolvementHours: 0.8,
+            modelTierId: "claude-sonnet-4-6"
+          },
+          p2: {
+            handCodeHours: 3.5,
+            aiInvolvementHours: 1.2,
+            modelTierId: "claude-opus-4-8"
+          },
+          p3: {
+            handCodeHours: 1.8,
+            aiInvolvementHours: 1.0,
+            modelTierId: "claude-sonnet-4-6"
+          },
+          p4: {
+            handCodeHours: 2.2,
+            aiInvolvementHours: 0.7,
+            modelTierId: "claude-haiku-4-5"
+          }
+        }
+      };
+
+      let state = loadState();
+
+      const els = {
+        sessionStatus: document.querySelector("#sessionStatus"),
+        taskTitle: document.querySelector("#taskTitle"),
+        taskSize: document.querySelector("#taskSize"),
+        hourlyRate: document.querySelector("#hourlyRate"),
+        activePlayer: document.querySelector("#activePlayer"),
+        playerList: document.querySelector("#playerList"),
+        pricingCards: document.querySelector("#pricingCards"),
+        activePlayerStatus: document.querySelector("#activePlayerStatus"),
+        handHours: document.querySelector("#handHours"),
+        handHoursValue: document.querySelector("#handHoursValue"),
+        aiHours: document.querySelector("#aiHours"),
+        aiHoursValue: document.querySelector("#aiHoursValue"),
+        modelChoices: document.querySelector("#modelChoices"),
+        saveEstimate: document.querySelector("#saveEstimate"),
+        nextPlayer: document.querySelector("#nextPlayer"),
+        reveal: document.querySelector("#reveal"),
+        revote: document.querySelector("#revote"),
+        resetSession: document.querySelector("#resetSession"),
+        addPlayer: document.querySelector("#addPlayer"),
+        resultsView: document.querySelector("#resultsView")
+      };
+
+      function loadState() {
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+          return structuredClone(defaultState);
+        }
+
+        try {
+          return normalizeState({
+            ...structuredClone(defaultState),
+            ...JSON.parse(stored)
+          });
+        } catch {
+          return structuredClone(defaultState);
+        }
+      }
+
+      function normalizeState(nextState) {
+        const normalized = {
+          ...nextState,
+          estimates: {
+            ...nextState.estimates
+          }
+        };
+
+        Object.entries(normalized.estimates).forEach(([playerId, estimate]) => {
+          normalized.estimates[playerId] = {
+            ...estimate,
+            modelTierId: legacyModelIds[estimate.modelTierId] || estimate.modelTierId
+          };
+        });
+
+        return normalized;
+      }
+
+      function saveState() {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function money(value) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: value >= 10 ? 0 : 1
+        }).format(value);
+      }
+
+      function hours(value) {
+        return `${Number(value).toFixed(1)}h`;
+      }
+
+      function getActiveEstimate() {
+        return (
+          state.estimates[state.activePlayerId] || {
+            handCodeHours: 2,
+            aiInvolvementHours: 1,
+            modelTierId: "mid"
+          }
+        );
+      }
+
+      function getTokenSpend(estimate) {
+        const modelId = legacyModelIds[estimate.modelTierId] || estimate.modelTierId;
+        const tier = modelTiers.find((item) => item.id === modelId) || modelTiers[2];
+        const size = sizePresets[state.taskSize];
+        const inputMTok = (size.inputTokensPerIteration * size.iterations) / 1000000;
+        const outputMTok = (size.outputTokensPerIteration * size.iterations) / 1000000;
+        return inputMTok * tier.inputPricePerMTok + outputMTok * tier.outputPricePerMTok;
+      }
+
+      function getResult(player) {
+        const estimate = state.estimates[player.id];
+        if (!estimate) {
+          return null;
+        }
+
+        const handCost = estimate.handCodeHours * state.hourlyRate;
+        const aiHumanCost = estimate.aiInvolvementHours * state.hourlyRate;
+        const tokenSpend = getTokenSpend(estimate);
+        const aiCost = aiHumanCost + tokenSpend;
+        const delta = handCost - aiCost;
+        return {
+          player,
+          estimate,
+          handCost,
+          aiHumanCost,
+          tokenSpend,
+          aiCost,
+          delta
+        };
+      }
+
+      function getResults() {
+        return state.players.map(getResult).filter(Boolean);
+      }
+
+      function getMedian(values) {
+        if (!values.length) {
+          return 0;
+        }
+
+        const sorted = [...values].sort((a, b) => a - b);
+        const middle = Math.floor(sorted.length / 2);
+        if (sorted.length % 2) {
+          return sorted[middle];
+        }
+
+        return (sorted[middle - 1] + sorted[middle]) / 2;
+      }
+
+      function getVerdict(results) {
+        const handMedian = getMedian(results.map((result) => result.handCost));
+        const aiMedian = getMedian(results.map((result) => result.aiCost));
+        const threshold = Math.max(handMedian, aiMedian) * 0.2;
+        if (Math.abs(handMedian - aiMedian) <= threshold) {
+          return "even";
+        }
+
+        return aiMedian < handMedian ? "ai" : "hand";
+      }
+
+      function insightFor(results) {
+        if (!results.length) {
+          return "Submit estimates to reveal the cost comparison.";
+        }
+
+        const verdict = getVerdict(results);
+        const tokenTotal = results.reduce((sum, result) => sum + result.tokenSpend, 0);
+        const aiTotal = results.reduce((sum, result) => sum + result.aiCost, 0);
+        const tokenShare = aiTotal ? Math.round((tokenTotal / aiTotal) * 100) : 0;
+
+        if (verdict === "ai") {
+          return `Delegate it. Tokens are about ${tokenShare}% of the AI path cost; the savings come from reclaimed human time.`;
+        }
+
+        if (verdict === "even") {
+          return "Cost is roughly even. Decide based on review risk, learning value, and whether this pattern will repeat.";
+        }
+
+        return "Hand-coding is cheaper here. Treat that as a scope signal: this may be too small to be worth a delegation conversation.";
+      }
+
+      function renderModelChoices() {
+        const estimate = getActiveEstimate();
+        const modelId = legacyModelIds[estimate.modelTierId] || estimate.modelTierId;
+        els.modelChoices.innerHTML = modelTiers
+          .map(
+            (tier) => `
+              <button class="choice ${modelId === tier.id ? "active" : ""}" type="button" data-model="${tier.id}">
+                <strong>${tier.label}</strong>
+                <span>${tier.tier} · ${tier.character}</span>
+              </button>
+            `
+          )
+          .join("");
+
+        els.modelChoices.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", () => {
+            const current = getActiveEstimate();
+            state.estimates[state.activePlayerId] = {
+              ...current,
+              modelTierId: button.dataset.model
+            };
+            state.revealed = false;
+            saveState();
+            render();
+          });
+        });
+      }
+
+      function renderPricingCards() {
+        els.pricingCards.innerHTML = modelTiers
+          .map(
+            (tier) => `
+              <div class="setting-row">
+                <strong>${tier.label}</strong>
+                <span>
+                  ${tier.provider} ${tier.tier}: ${formatPrice(tier.inputPricePerMTok)} in /
+                  ${formatPrice(tier.outputPricePerMTok)} out per MTok${tier.cachedInputPricePerMTok ? `; ${formatPrice(tier.cachedInputPricePerMTok)} cached in` : ""}
+                </span>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      function formatPrice(value) {
+        return `$${Number(value).toLocaleString("en-US", {
+          maximumFractionDigits: 6
+        })}`;
+      }
+
+      function renderPlayers() {
+        els.activePlayer.innerHTML = state.players
+          .map((player) => `<option value="${player.id}">${player.name}</option>`)
+          .join("");
+        els.activePlayer.value = state.activePlayerId;
+
+        els.playerList.innerHTML = state.players
+          .map((player) => {
+            const submitted = Boolean(state.estimates[player.id]);
+            return `
+              <div class="player-row">
+                <div>
+                  <strong>${player.name}</strong>
+                  <span>${player.id === state.activePlayerId ? "Current player" : "Waiting"}</span>
+                </div>
+                <span class="pill ${submitted ? "done" : ""}">${submitted ? "Submitted" : "Open"}</span>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function renderEstimateForm() {
+        const estimate = getActiveEstimate();
+        els.handHours.value = estimate.handCodeHours;
+        els.aiHours.value = estimate.aiInvolvementHours;
+        els.handHoursValue.textContent = hours(estimate.handCodeHours);
+        els.aiHoursValue.textContent = hours(estimate.aiInvolvementHours);
+        const submitted = Boolean(state.estimates[state.activePlayerId]);
+        els.activePlayerStatus.textContent = submitted ? "Submitted" : "Not submitted";
+        els.activePlayerStatus.className = `pill ${submitted ? "done" : ""}`;
+        renderModelChoices();
+      }
+
+      function renderResults() {
+        const results = getResults();
+        const submittedCount = results.length;
+        const allSubmitted = submittedCount === state.players.length;
+        els.sessionStatus.textContent = `${submittedCount} of ${state.players.length} estimates submitted`;
+        els.reveal.disabled = !allSubmitted;
+
+        if (!state.revealed) {
+          els.resultsView.innerHTML = `
+            <div class="empty">
+              ${allSubmitted ? "Ready to reveal." : "Waiting for all estimates."}
+            </div>
+          `;
+          return;
+        }
+
+        const savingsValues = results.map((result) => result.delta);
+        const minSavings = Math.min(...savingsValues);
+        const medianSavings = getMedian(savingsValues);
+        const maxSavings = Math.max(...savingsValues);
+        const maxCost = Math.max(...results.flatMap((result) => [result.handCost, result.aiCost]));
+        const showScopeLadder = getVerdict(results) === "hand";
+
+        els.resultsView.innerHTML = `
+          <div class="summary-strip">
+            <div class="metric">
+              <span>Min delta</span>
+              <strong>${money(minSavings)}</strong>
+            </div>
+            <div class="metric">
+              <span>Median delta</span>
+              <strong>${money(medianSavings)}</strong>
+            </div>
+            <div class="metric">
+              <span>Max delta</span>
+              <strong>${money(maxSavings)}</strong>
+            </div>
+          </div>
+          <div class="insight">${insightFor(results)}</div>
+          <div class="result-list">
+            ${results.map((result) => renderResultCard(result, maxCost)).join("")}
+          </div>
+          ${
+            showScopeLadder
+              ? `
+                <div class="scope-ladder">
+                  <h3>Scope ladder</h3>
+                  <div class="ladder">
+                    <button type="button">This tweak</button>
+                    <button type="button">This bug class</button>
+                    <button type="button">This component</button>
+                    <button type="button">This workflow</button>
+                    <button type="button">This subsystem</button>
+                  </div>
+                </div>
+              `
+              : ""
+          }
+        `;
+      }
+
+      function renderResultCard(result, maxCost) {
+        const handWidth = Math.max(3, Math.round((result.handCost / maxCost) * 100));
+        const aiWidth = Math.max(3, Math.round((result.aiCost / maxCost) * 100));
+        const tokenWidth = Math.max(1, Math.round((result.tokenSpend / maxCost) * 100));
+        const aiHumanWidth = Math.max(2, aiWidth - tokenWidth);
+        const modelId = legacyModelIds[result.estimate.modelTierId] || result.estimate.modelTierId;
+        const model = modelTiers.find((tier) => tier.id === modelId) || modelTiers[2];
+        const aiWins = result.aiCost < result.handCost;
+
+        return `
+          <article class="result-card">
+            <div class="result-top">
+              <strong>${result.player.name} <span style="color: var(--muted); font-weight: 700;">${model.label}</span></strong>
+              <span class="delta ${aiWins ? "ai" : ""}">${aiWins ? "AI lower" : "Hand lower"} by ${money(Math.abs(result.delta))}</span>
+            </div>
+            <div class="bar-pair">
+              <div class="bar-row">
+                <span>Hand</span>
+                <span class="track"><span class="fill" style="--w: ${handWidth}%"></span></span>
+                <span>${money(result.handCost)}</span>
+              </div>
+              <div class="bar-row">
+                <span>AI</span>
+                <span class="track">
+                  <span class="fill ai-human" style="--w: ${aiHumanWidth}%"></span>
+                  <span class="fill ai-token" style="--human-w: ${aiHumanWidth}%; --token-w: ${tokenWidth}%"></span>
+                </span>
+                <span>${money(result.aiCost)}</span>
+              </div>
+            </div>
+            <p class="subtitle">AI path: ${money(result.aiHumanCost)} human involvement + ${money(result.tokenSpend)} token spend.</p>
+          </article>
+        `;
+      }
+
+      function render() {
+        els.taskTitle.value = state.taskTitle;
+        els.taskSize.value = state.taskSize;
+        els.hourlyRate.value = state.hourlyRate;
+        renderPlayers();
+        renderPricingCards();
+        renderEstimateForm();
+        renderResults();
+      }
+
+      function saveActiveEstimate() {
+        const current = getActiveEstimate();
+        state.estimates[state.activePlayerId] = {
+          ...current,
+          handCodeHours: Number(els.handHours.value),
+          aiInvolvementHours: Number(els.aiHours.value)
+        };
+        state.revealed = false;
+        saveState();
+        render();
+      }
+
+      function moveToNextPlayer() {
+        const currentIndex = state.players.findIndex((player) => player.id === state.activePlayerId);
+        const nextIndex = (currentIndex + 1) % state.players.length;
+        state.activePlayerId = state.players[nextIndex].id;
+        saveState();
+        render();
+      }
+
+      els.taskTitle.addEventListener("input", () => {
+        state.taskTitle = els.taskTitle.value;
+        state.revealed = false;
+        saveState();
+      });
+
+      els.taskSize.addEventListener("change", () => {
+        state.taskSize = els.taskSize.value;
+        state.revealed = false;
+        saveState();
+        render();
+      });
+
+      els.hourlyRate.addEventListener("input", () => {
+        state.hourlyRate = Number(els.hourlyRate.value || 0);
+        state.revealed = false;
+        saveState();
+        renderResults();
+      });
+
+      els.activePlayer.addEventListener("change", () => {
+        state.activePlayerId = els.activePlayer.value;
+        saveState();
+        render();
+      });
+
+      [els.handHours, els.aiHours].forEach((input) => {
+        input.addEventListener("input", () => {
+          if (input === els.handHours) {
+            els.handHoursValue.textContent = hours(input.value);
+          } else {
+            els.aiHoursValue.textContent = hours(input.value);
+          }
+        });
+      });
+
+      els.saveEstimate.addEventListener("click", saveActiveEstimate);
+
+      els.nextPlayer.addEventListener("click", () => {
+        saveActiveEstimate();
+        moveToNextPlayer();
+      });
+
+      els.reveal.addEventListener("click", () => {
+        state.revealed = true;
+        saveState();
+        render();
+      });
+
+      els.revote.addEventListener("click", () => {
+        state.revealed = false;
+        state.estimates = {};
+        saveState();
+        render();
+      });
+
+      els.resetSession.addEventListener("click", () => {
+        state = structuredClone(defaultState);
+        saveState();
+        render();
+      });
+
+      els.addPlayer.addEventListener("click", () => {
+        if (state.players.length >= 6) {
+          return;
+        }
+
+        const id = `p${Date.now()}`;
+        state.players.push({
+          id,
+          name: `Player ${state.players.length + 1}`
+        });
+        state.activePlayerId = id;
+        state.revealed = false;
+        saveState();
+        render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
